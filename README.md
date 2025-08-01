@@ -8,4 +8,3 @@
 5. npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
 6. npx heroui-cli@latest add --all
 7. npm install @heroui/react      
-8. 

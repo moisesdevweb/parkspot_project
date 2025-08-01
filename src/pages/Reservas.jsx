@@ -8,7 +8,7 @@ function Reservas() {
 
   return (
     <div className="p-6 bg-gray-800 text-white rounded-lg">
-      <h2 className="text-2xl mb-4">Reservar Estacionamiento</h2>
+      <h2 className="text-2xl mb-4">Reservar Estacionamiento parkspot de moises y no es la rama principal </h2>
       <p>Elige una opción para reservar tu espacio de estacionamiento.</p>
 
       {/* Ejemplo de botón para continuar con la reserva */}
