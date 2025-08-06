@@ -46,7 +46,7 @@ function ClientDashboard() {
     <DashboardLayout
       user={user}
       onLogout={handleLogout}
-      onProfile={() => navigate('/profile')}
+      onProfile={() => navigate('/dashboard/profile')}
       onNavigate={ruta => {
         if (ruta === '/logout') handleLogout();
         else navigate(ruta);

@@ -14,7 +14,12 @@ const DashboardAppBar = ({ user, anchorEl, onMenuOpen, onMenuClose, onProfile, o
           <Avatar>{user.username.charAt(0).toUpperCase()}</Avatar>
         </IconButton>
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onMenuClose}>
-          <MenuItem onClick={onProfile}>Perfil</MenuItem>
+          <MenuItem onClick={() => {
+  onMenuClose();
+  onProfile();
+}}>
+  Editar Perfil
+</MenuItem>
           <MenuItem onClick={onLogout}>Salir</MenuItem>
         </Menu>
       </div>
