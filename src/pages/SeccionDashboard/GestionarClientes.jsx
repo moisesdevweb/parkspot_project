@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../components/DasboardGeneral/DashboardLayout";
 import UserTable from "../../components/DasboardGeneral/UserTable";
-import ModalPersona from "../../components/DasboardGeneral/ModalPersona";
+import ModalPersona from "../../components/Modal/ModalPersona";
+import ModalRegistrarPersona from "../../components/Modal/ModalRegistrarCliente";
 import BuscadorPersona from "../../components/DasboardGeneral/BuscadorPersona";
 import Loader from "../../components/DasboardGeneral/Loader";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ export default function GestionarClientes() {
   const [clientes, setClientes] = useState([]);
   const [loadingInicial, setLoadingInicial] = useState(true); // solo para la primera carga
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalRegistrarOpen, setModalRegistrarOpen] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [modalMode, setModalMode] = useState("view");
   const user = JSON.parse(localStorage.getItem("user"));
@@ -131,15 +133,26 @@ export default function GestionarClientes() {
         <h1 className="text-2xl font-bold text-white mb-2">Lista de Clientes</h1>
         <p className="text-gray-300 mb-4">Aquí puedes ver y editar los clientes registrados.</p>
       </div>
-      {loadingInicial ? (
-        <Loader />
-      ) : (
-        <>
+      {/* Buscador y botón en la misma línea */}
+      <div className="flex items-center gap-4 mb-4">
+        <div className="flex-1">
           <BuscadorPersona
             onBuscar={buscarClientes}
             onLimpiar={fetchClientes}
             placeholder="Buscar cliente por nombre..."
           />
+        </div>
+        <button
+          className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
+          onClick={() => setModalRegistrarOpen(true)}
+        >
+          Agregar Cliente
+        </button>
+      </div>
+      {loadingInicial ? (
+        <Loader />
+      ) : (
+        <>
           <UserTable users={clientes} onEdit={handleEdit} onView={handleView} />
           <ModalPersona
             open={modalOpen}
@@ -153,6 +166,12 @@ export default function GestionarClientes() {
           />
         </>
       )}
+      {/* Modal para registrar cliente */}
+      <ModalRegistrarPersona
+        open={modalRegistrarOpen}
+        onClose={() => setModalRegistrarOpen(false)}
+        onRegistrado={fetchClientes}
+      />
     </DashboardLayout>
   );
 }

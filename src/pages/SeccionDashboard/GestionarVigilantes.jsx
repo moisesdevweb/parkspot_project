@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../components/DasboardGeneral/DashboardLayout";
 import UserTable from "../../components/DasboardGeneral/UserTable";
-import ModalPersona from "../../components/DasboardGeneral/ModalPersona";
+import ModalPersona from "../../components/Modal/ModalPersona";
 import BuscadorPersona from "../../components/DasboardGeneral/BuscadorPersona";
 import Loader from "../../components/DasboardGeneral/Loader";
 import { useNavigate } from "react-router-dom";
