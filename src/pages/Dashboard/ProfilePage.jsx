@@ -3,16 +3,17 @@ import React from "react";
 import DashboardLayout from "../../components/DasboardGeneral/DashboardLayout";
 import Profile from "./Profile";
 import { useNavigate } from "react-router-dom";
+import { clearAuth, getUser } from "../../utils/api";
 
 export default function ProfilePage() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = getUser();
   const navigate = useNavigate();
 
   return (
     <DashboardLayout
       user={user}
       onProfile={() => navigate("/dashboard/profile")}
-      onLogout={() => { /* lógica logout */ navigate("/login"); }}
+      onLogout={() => { clearAuth(); navigate("/login"); }}
       onNavigate={navigate}
     >
       <Profile />

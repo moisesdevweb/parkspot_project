@@ -2,29 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/DasboardGeneral/DashboardLayout';
+import { getUser, clearAuth } from '../../utils/api';
 
 function AdminVigilanteDashboard() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      try {
-        const userObj = JSON.parse(userData);
-        setUser(userObj);
-        // Si el usuario no es admin ni vigilante, redirige
-        if (
-          !userObj.roles.includes('ROLE_ADMIN') &&
-          !userObj.roles.includes('ROLE_VIGILANTE')
-        ) {
-          navigate('/dashboard/cliente');
-        }
-      } catch {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+    const userObj = getUser();
+    if (userObj) {
+      setUser(userObj);
+      const roles = userObj.roles || [];
+      if (!roles.includes('ROLE_ADMIN') && !roles.includes('ROLE_VIGILANTE')) {
+        navigate('/dashboard/cliente');
       }
     } else {
       navigate('/login');
@@ -32,8 +22,7 @@ function AdminVigilanteDashboard() {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    clearAuth();
     navigate('/login');
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 export default function BuscadorPersona({
   onBuscar,
@@ -6,38 +6,42 @@ export default function BuscadorPersona({
   placeholder = "Buscar por nombre..."
 }) {
   const [nombre, setNombre] = useState("");
-  const [debouncedNombre, setDebouncedNombre] = useState(nombre);
-  const prevNombre = useRef("");
+  const timeoutRef = useRef(null);
 
-  // Debounce: espera 400ms después de dejar de escribir
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedNombre(nombre);
-    }, 400);
-    return () => clearTimeout(handler);
-  }, [nombre]);
+  // Memoiza las funciones para evitar el warning
+  const memoizedOnBuscar = useCallback(onBuscar, [onBuscar]);
+  const memoizedOnLimpiar = useCallback(onLimpiar, [onLimpiar]);
 
   useEffect(() => {
-    // Solo busca si hay texto
-    if (debouncedNombre.trim() !== "") {
-      onBuscar(debouncedNombre.trim());
+    // Limpia el timeout anterior
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-    // Si el usuario borra todo, recarga la lista solo una vez
-    else if (prevNombre.current !== "") {
-      if (onLimpiar) onLimpiar();
-    }
-    prevNombre.current = debouncedNombre;
-  }, [debouncedNombre, onBuscar, onLimpiar]);
+
+    // Configura un nuevo timeout
+    timeoutRef.current = setTimeout(() => {
+      if (nombre.trim() === "") {
+        memoizedOnLimpiar?.();
+      } else if (nombre.trim().length >= 2) { // <-- Busca desde 2 caracteres
+        memoizedOnBuscar(nombre.trim());
+      }
+    }, 600);
+
+    // Cleanup al desmontar
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [nombre, memoizedOnBuscar, memoizedOnLimpiar]);
 
   return (
-    <div className="flex gap-2 mb-4">
-      <input
-        type="text"
-        className="px-3 py-2 rounded bg-gray-800 text-white w-full"
-        placeholder={placeholder}
-        value={nombre}
-        onChange={e => setNombre(e.target.value)}
-      />
-    </div>
+    <input
+      type="text"
+      className="px-3 py-2 rounded bg-gray-800 text-white w-full"
+      placeholder={placeholder}
+      value={nombre}
+      onChange={e => setNombre(e.target.value)}
+    />
   );
 }

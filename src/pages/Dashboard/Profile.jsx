@@ -3,6 +3,7 @@ import { Input, Spinner } from "@heroui/react";
 import Button from "../../components/Button";
 import { UserCircleIcon } from "@heroicons/react/24/solid"; // Si tienes Heroicons
 import toast from 'react-hot-toast';
+import { authFetch, getUser } from "../../utils/api";
 
 function Profile() {
   const [perfil, setPerfil] = useState(null);
@@ -11,25 +12,27 @@ function Profile() {
   const [form, setForm] = useState({});
   const [error, setError] = useState(null);
 
-  const [user] = useState(() => JSON.parse(localStorage.getItem("user")));
-  const [token] = useState(() => localStorage.getItem("token"));
+  const [user] = useState(() => getUser());
 
   useEffect(() => {
-    if (!user?.username || !token) return;
-    fetch(`http://localhost:8080/api/persona/perfil/${user.username}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setPerfil(data);
-        setForm(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("No se pudo cargar el perfil");
-        setLoading(false);
-      });
-  }, [user, token]);
+    if (!user?.username) return;
+
+    const cargarPerfil = () => {
+      authFetch(`/api/persona/perfil/${user.username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setPerfil(data);
+          setForm(data);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError("No se pudo cargar el perfil");
+          setLoading(false);
+        });
+    };
+
+    cargarPerfil();
+  }, [user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,12 +48,8 @@ function Profile() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8080/api/persona/perfil/${user.username}`, {
+      const res = await authFetch(`/api/persona/perfil/${user.username}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           nombreCompleto: form.nombreCompleto,
           apellidos: form.apellidos,
@@ -61,10 +60,10 @@ function Profile() {
       if (!res.ok) throw new Error("Error al actualizar");
       setPerfil({ ...perfil, ...form });
       setEdit(false);
-      toast.success("¡Perfil actualizado correctamente!"); // <-- Notificación de éxito
+      toast.success("¡Perfil actualizado correctamente!");
     } catch {
       setError("No se pudo actualizar el perfil");
-      toast.error("Error al actualizar el perfil"); // <-- Notificación de error
+      toast.error("Error al actualizar el perfil");
     }
     setLoading(false);
   };

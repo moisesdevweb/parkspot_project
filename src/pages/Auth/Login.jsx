@@ -4,53 +4,57 @@ import { Input, Button, Spinner } from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 import loginImg from '../../assets/parking_img/park_spot.jpg'; // Cambia la ruta a tu imagen
 import { EyeFilledIcon, EyeSlashFilledIcon } from '../../components/Auth/Icon/EyeIcons';
+import { setAuth, API_BASE } from '../../utils/api';
 
-function Login() {
+const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     const formData = new FormData(e.target);
     const credentials = {
       username: formData.get('username'),
       password: formData.get('password'),
     };
 
-    setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
       });
-
       const result = await response.json();
-      console.log(result); // <-- Agrega esto para depurar
+
       if (response.ok) {
-        localStorage.setItem('token', result.accessToken);
-        localStorage.setItem('user', JSON.stringify(result)); // Guarda el usuario completo
-        const role = result.roles[0];
-        if (role === 'ROLE_ADMIN' || role === 'ROLE_VIGILANTE') {
+        setAuth(result);
+        console.log("LOGIN RESULT:", result); // <-- Mira cómo llegan los roles
+        const roles = result.roles || [];
+        if (roles.includes('ROLE_ADMIN') || roles.includes('ROLE_VIGILANTE')) {
           navigate('/dashboard/admin');
-        } else {
+        } else if (roles.includes('ROLE_CLIENTE')) {
           navigate('/dashboard/cliente');
+        } else {
+          setError("Rol de usuario no reconocido");
         }
       } else {
-        // Personaliza el mensaje de error
-        if (result.message === "Bad credentials") {
-          setError("Usuario o contraseña incorrectos.");
+        // Traduce el mensaje del backend si es "Bad credentials"
+        if (result.message && result.message.toLowerCase().includes("bad credentials")) {
+          setError("Usuario o contraseña incorrecta");
         } else {
-          setError(result.message);
+          setError(result.message || "Credenciales incorrectas");
         }
       }
-    } catch (err) {
-      console.error(err);
-      setError('Error al autenticar. Inténtalo nuevamente.');
+    } catch  {
+      setError("Error de conexión");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -65,7 +69,7 @@ function Login() {
           <h2 className="text-3xl font-bold text-white mb-2">Bienvenido a ParkSpot 👋</h2>
           <p className="text-gray-400 mb-8">Ingresa tus datos para acceder a tu cuenta.</p>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             <Input
               name="username"
               label="Usuario o Correo"

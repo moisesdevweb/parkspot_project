@@ -5,8 +5,11 @@ import ModalPersona from "../../components/Modal/ModalPersona";
 import ModalRegistrarPersona from "../../components/Modal/ModalRegistrarCliente";
 import BuscadorPersona from "../../components/DasboardGeneral/BuscadorPersona";
 import Loader from "../../components/DasboardGeneral/Loader";
+import Button from "../../components/Button"; // <-- Importa tu componente Button
 import { useNavigate } from "react-router-dom";
+import { PlusIcon } from "@heroicons/react/24/outline"; // <-- Importa el ícono
 import toast from "react-hot-toast";
+import { authFetch, clearAuth, getUser } from "../../utils/api";
 
 const camposCliente = [
   { name: "username", label: "Usuario", editable: false },
@@ -25,20 +28,18 @@ export default function GestionarClientes() {
   const [modalRegistrarOpen, setModalRegistrarOpen] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = getUser();
   const navigate = useNavigate();
 
   const fetchClientes = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/persona/listar-clientes", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const res = await authFetch("/api/persona/listar-clientes");
       const data = await res.json();
       setClientes(data);
     } catch {
       toast.error("No se pudieron cargar los clientes");
     }
-    setLoadingInicial(false); // solo aquí
+    setLoadingInicial(false);
   };
 
   useEffect(() => {
@@ -59,61 +60,37 @@ export default function GestionarClientes() {
 
   const handleSave = async (nuevoCliente) => {
     try {
-      // Actualiza datos personales
-      const resDatos = await fetch(
-        `http://localhost:8080/api/persona/cliente/${nuevoCliente.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            email: nuevoCliente.email,
-            nombreCompleto: nuevoCliente.nombreCompleto,
-            apellidos: nuevoCliente.apellidos,
-            dni: nuevoCliente.dni,
-            direccion: nuevoCliente.direccion,
-            telefono: nuevoCliente.telefono,
-          }),
-        }
-      );
-      if (!resDatos.ok) {
-        const error = await resDatos.json();
+      const res = await authFetch(`/api/persona/cliente-completo/${nuevoCliente.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          email: nuevoCliente.email,
+          nombreCompleto: nuevoCliente.nombreCompleto,
+          apellidos: nuevoCliente.apellidos,
+          dni: nuevoCliente.dni,
+          direccion: nuevoCliente.direccion,
+          telefono: nuevoCliente.telefono,
+          estado: nuevoCliente.estado,
+          vehiculos: nuevoCliente.vehiculos,
+        }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
         throw new Error(error.message || "Error al actualizar datos del cliente");
       }
-
-      // Actualiza el estado
-      const resEstado = await fetch(
-        `http://localhost:8080/api/persona/cliente/estado/${nuevoCliente.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            estado: nuevoCliente.estado,
-          }),
-        }
-      );
-      if (!resEstado.ok) throw new Error("Error al actualizar el estado del cliente");
 
       toast.success("Cliente actualizado");
       setClientes((prev) =>
         prev.map((c) => (c.id === nuevoCliente.id ? { ...c, ...nuevoCliente } : c))
       );
+      setModalOpen(false); // <-- Esto cierra el modal después de guardar
     } catch (err) {
       toast.error(err.message || "No se pudo actualizar el cliente");
     }
-    setModalOpen(false);
   };
 
   const buscarClientes = async (nombre) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/persona/buscar-clientes?nombre=${encodeURIComponent(nombre)}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const res = await authFetch(`/api/persona/buscar-clientes?nombre=${encodeURIComponent(nombre)}`);
       const data = await res.json();
       setClientes(data);
     } catch {
@@ -125,7 +102,7 @@ export default function GestionarClientes() {
   return (
     <DashboardLayout
       user={user}
-      onLogout={() => { localStorage.clear(); navigate("/login"); }}
+      onLogout={() => { clearAuth(); navigate("/login"); }}
       onProfile={() => navigate("/dashboard/profile")}
       onNavigate={navigate}
     >
@@ -142,12 +119,14 @@ export default function GestionarClientes() {
             placeholder="Buscar cliente por nombre..."
           />
         </div>
-        <button
-          className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition"
+        <Button
+          variant="success"
+          size="md"
+          icon={<PlusIcon className="w-4 h-4" />}
           onClick={() => setModalRegistrarOpen(true)}
         >
           Agregar Cliente
-        </button>
+        </Button>
       </div>
       {loadingInicial ? (
         <Loader />
@@ -163,6 +142,7 @@ export default function GestionarClientes() {
             campos={camposCliente}
             titulo={modalMode === "edit" ? "Editar Cliente" : "Ver Cliente"}
             mostrarEstado={true}
+            mostrarVehiculos={true} // <--- SOLO AQUÍ
           />
         </>
       )}

@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, PencilIcon } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast"; // Asegúrate de tener esto importado
 
 const estadoOptions = [
   { value: 1, label: "Activo" },
@@ -17,8 +18,10 @@ export default function ModalPersona({
   campos = [],
   titulo = "Detalle",
   mostrarEstado = true,
+  mostrarVehiculos = false, // <--- NUEVA PROP
 }) {
   const [form, setForm] = useState({});
+  const [vehiculos, setVehiculos] = useState([]);
 
   useEffect(() => {
     if (persona) {
@@ -28,6 +31,7 @@ export default function ModalPersona({
       });
       if (mostrarEstado) initial.estado = persona.estado ?? 1;
       setForm(initial);
+      setVehiculos(persona.vehiculos ? persona.vehiculos.map(v => ({ ...v })) : []);
     }
   }, [persona, campos, mostrarEstado]);
 
@@ -38,9 +42,53 @@ export default function ModalPersona({
     setForm({ ...form, [name]: name === "estado" ? Number(value) : value });
   };
 
+  // Vehículos handlers
+  const handleVehiculoChange = (idx, field, value) => {
+    setVehiculos(vehiculos =>
+      vehiculos.map((v, i) => (i === idx ? { ...v, [field]: value } : v))
+    );
+  };
+
+  const handleAddVehiculo = () => {
+    setVehiculos([
+      ...vehiculos,
+      { placa: "", marca: "", modelo: "", color: "", año: "", tipo: "" },
+    ]);
+  };
+
+  const handleRemoveVehiculo = idx => {
+    setVehiculos(vehiculos => vehiculos.filter((_, i) => i !== idx));
+  };
+
+  function validar(form, vehiculos) {
+    if (!/^[a-zA-Z0-9_-]{3,20}$/.test(form.username)) {
+      return "El usuario solo puede tener letras, números, guion y guion bajo (3-20 caracteres, sin espacios)";
+    }
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/.test(form.email)) {
+      return "El correo no es válido";
+    }
+    if (!/^\d{8}$/.test(form.dni)) {
+      return "El DNI debe tener 8 dígitos";
+    }
+    if (!/^\d{7,}$/.test(form.telefono)) {
+      return "El teléfono debe tener al menos 7 dígitos";
+    }
+    for (const v of vehiculos) {
+      if (!/^[A-Z0-9-]{5,10}$/i.test(v.placa)) return "Placa inválida";
+      if (!v.marca || !v.modelo || !v.color || !v.tipo) return "Completa todos los datos del vehículo";
+      if (!/^\d{4}$/.test(v.año)) return "El año del vehículo debe tener 4 dígitos";
+    }
+    return null;
+  }
+
   const handleSubmit = e => {
     e.preventDefault();
-    onSave({ ...persona, ...form });
+    const error = validar(form, vehiculos);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    onSave({ ...persona, ...form, vehiculos });
   };
 
   const inputClass = editable =>
@@ -59,6 +107,7 @@ export default function ModalPersona({
       });
       if (mostrarEstado) initial.estado = persona.estado ?? 1;
       setForm(initial);
+      setVehiculos(persona.vehiculos ? persona.vehiculos.map(v => ({ ...v })) : []);
     }
     onClose();
   };
@@ -139,6 +188,88 @@ export default function ModalPersona({
                       )}
                     </div>
                   )}
+
+                  {/* SOLO mostrar vehículos si mostrarVehiculos es true */}
+                  {mostrarVehiculos && (
+                    <div className="mt-6">
+                      <h3 className="text-white font-semibold mb-2">Vehículos registrados</h3>
+                      {vehiculos.length > 0 ? (
+                        <ul className="space-y-2">
+                          {vehiculos.map((v, idx) => (
+                            <li key={v.id || idx} className="bg-gray-800 rounded p-3 text-white flex flex-col gap-1">
+                              {mode === "edit" ? (
+                                <>
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Placa"
+                                    value={v.placa}
+                                    onChange={e => handleVehiculoChange(idx, "placa", e.target.value)}
+                                  />
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Marca"
+                                    value={v.marca}
+                                    onChange={e => handleVehiculoChange(idx, "marca", e.target.value)}
+                                  />
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Modelo"
+                                    value={v.modelo}
+                                    onChange={e => handleVehiculoChange(idx, "modelo", e.target.value)}
+                                  />
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Color"
+                                    value={v.color}
+                                    onChange={e => handleVehiculoChange(idx, "color", e.target.value)}
+                                  />
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Año"
+                                    value={v.año}
+                                    onChange={e => handleVehiculoChange(idx, "año", e.target.value)}
+                                  />
+                                  <input
+                                    className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
+                                    placeholder="Tipo"
+                                    value={v.tipo}
+                                    onChange={e => handleVehiculoChange(idx, "tipo", e.target.value)}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="mt-1 px-2 py-1 bg-red-700 rounded text-white hover:bg-red-800 w-fit"
+                                    onClick={() => handleRemoveVehiculo(idx)}
+                                  >
+                                    Quitar
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <span><b>Placa:</b> {v.placa}</span>
+                                  <span><b>Marca:</b> {v.marca}</span>
+                                  <span><b>Modelo:</b> {v.modelo}</span>
+                                  <span><b>Color:</b> {v.color}</span>
+                                  <span><b>Año:</b> {v.año}</span>
+                                  <span><b>Tipo:</b> {v.tipo}</span>
+                                </>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-400">No hay vehículos registrados.</p>
+                      )}
+                      {mode === "edit" && (
+                        <button
+                          type="button"
+                          className="mt-3 px-4 py-2 rounded bg-green-700 text-white hover:bg-green-800 transition"
+                          onClick={handleAddVehiculo}
+                        >
+                          Agregar Vehículo
+                        </button>
+                      )}
+                    </div>
+                  )}
                   {mode === "edit" && (
                     <div className="flex justify-end gap-2 mt-4">
                       <button
@@ -158,23 +289,6 @@ export default function ModalPersona({
                     </div>
                   )}
                 </form>
-
-                {/* Nueva sección para mostrar vehículos registrados */}
-                {Array.isArray(persona.vehiculos) && persona.vehiculos.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-white font-semibold mb-2">Vehículos registrados</h3>
-                    <ul className="space-y-2">
-                      {persona.vehiculos.map(v => (
-                        <li key={v.id} className="bg-gray-800 rounded p-3 text-white flex flex-col">
-                          <span><b>Placa:</b> {v.placa}</span>
-                          <span><b>Marca:</b> {v.marca}</span>
-                          <span><b>Modelo:</b> {v.modelo}</span>
-                          <span><b>Tipo:</b> {v.tipo}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

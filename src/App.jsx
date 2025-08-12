@@ -6,9 +6,13 @@ import AdminVigilanteDashboard from './pages/Dashboard/AdminVigilanteDashboard';
 import ClientDashboard from './pages/Dashboard/ClientDashboard';
 import Reservas from './pages/Reservas';
 import PrivateRoute from './components/PrivateRoute';
-import ProfilePage from './pages/Dashboard/ProfilePage'; // <-- Importa ProfilePage
-import GestionarVigilantes from './pages/SeccionDashboard/GestionarVigilantes'; // <-- Importa tu página
+import ProfilePage from './pages/Dashboard/ProfilePage';
+import GestionarVigilantes from './pages/SeccionDashboard/GestionarVigilantes';
 import GestionarClientes from './pages/SeccionDashboard/GestionarClientes';
+import ReportesAdmin from './pages/Reportes/ReportesAdmin';
+import ReportesVigilante from './pages/Reportes/ReportesVigilante';
+import ReportesCliente from './pages/Reportes/ReportesCliente';
+
 
 
 function App() {
@@ -51,7 +55,22 @@ function App() {
             <GestionarClientes />
           </PrivateRoute>
         } />
-
+        <Route path="/dashboard/reportes" element={
+          <PrivateRoute>
+            <ReportesAdmin />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/reportes-vigilante" element={
+          <PrivateRoute>
+            <ReportesVigilante />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/reportes-cliente" element={
+          <PrivateRoute>
+            <ReportesCliente />
+          </PrivateRoute>
+        } />
+        
         {/* Página de reservas */}
         <Route path="/reservas" element={<Reservas />} />
       </Routes>
