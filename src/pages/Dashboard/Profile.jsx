@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Input, Spinner } from "@heroui/react";
 import Button from "../../components/Button";
-import { UserCircleIcon, PencilIcon, XMarkIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
+import { 
+  UserCircleIcon, 
+  PencilIcon, 
+  XMarkIcon, 
+  CheckCircleIcon,
+  UserIcon,
+  IdentificationIcon,
+  PhoneIcon,
+  HomeIcon,
+  EnvelopeIcon,
+  CalendarIcon,
+  ShieldCheckIcon,
+  GlobeAltIcon,
+  CogIcon
+} from "@heroicons/react/24/solid";
 import toast from 'react-hot-toast';
 import { authFetch, getUser } from "../../utils/api";
 
@@ -20,6 +34,7 @@ function Profile() {
 
     const loadProfile = async () => {
       try {
+        setLoading(true);
         const response = await authFetch(`/api/persona/perfil/${user.username}`);
         if (!response.ok) throw new Error("Error al cargar perfil");
         
@@ -41,7 +56,7 @@ function Profile() {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     
-    // Validación en tiempo real
+    // Validación en tiempo real para teléfono
     if (name === "telefono") {
       if (!value.match(/^\d{0,9}$/)) {
         setErrors(prev => ({ ...prev, telefono: "Solo se permiten números" }));
@@ -111,21 +126,24 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <Spinner size="xl" />
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="flex flex-col items-center">
+          <Spinner size="xl" className="text-indigo-500" />
+          <p className="mt-4 text-gray-400">Cargando tu perfil...</p>
+        </div>
       </div>
     );
   }
 
   if (errors.fetch) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center items-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col justify-center items-center p-4">
+        <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center border border-gray-700">
           <div className="text-red-500 mb-4">
             <XMarkIcon className="w-16 h-16 mx-auto" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Error al cargar el perfil</h2>
-          <p className="text-gray-600 mb-6">{errors.fetch}</p>
+          <h2 className="text-xl font-bold text-gray-200 mb-2">Error al cargar el perfil</h2>
+          <p className="text-gray-400 mb-6">{errors.fetch}</p>
           <Button color="primary" onClick={() => window.location.reload()}>
             Reintentar
           </Button>
@@ -135,155 +153,198 @@ function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
-        {/* Encabezado con gradiente */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Mi Perfil</h1>
-            <div className="flex items-center space-x-2">
-              <UserCircleIcon className="w-8 h-8" />
-              <span className="font-medium">{user.username}</span>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-indigo-700 to-purple-800 mb-6 border-4 border-gray-800 shadow-lg">
+            <UserIcon className="w-16 h-16 text-indigo-200" />
           </div>
+          <h1 className="text-3xl font-bold text-white">Configuración de Perfil</h1>
+          <p className="mt-3 text-lg text-gray-400">
+            Administra tu información personal
+          </p>
         </div>
 
-        <div className="p-6 md:p-8">
-          {/* Avatar y email */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative mb-4">
-              <UserCircleIcon className="w-24 h-24 text-blue-400" />
-              {editMode && (
-                <button
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition transform hover:scale-105"
-                  title="Cambiar foto"
-                >
-                  <PencilIcon className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-            <p className="text-gray-600 bg-blue-50 px-4 py-2 rounded-full text-sm">
-              {profile.email}
-            </p>
-          </div>
-
-          <form onSubmit={handleSave} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
+          <div className="p-6 sm:p-8">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-700">
               <div>
-                <Input
-                  label="Usuario"
-                  value={profile.username}
-                  disabled
-                  icon={<UserCircleIcon className="w-5 h-5 text-gray-400" />}
-                />
-              </div>
-              <div>
-                <Input
-                  label="DNI"
-                  value={profile.dni}
-                  disabled
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Input
-                  label="Nombre Completo"
-                  name="nombreCompleto"
-                  value={form.nombreCompleto || ""}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  required
-                  error={errors.nombreCompleto}
-                  placeholder="Ej: Juan Carlos"
-                />
-              </div>
-              <div>
-                <Input
-                  label="Apellidos"
-                  name="apellidos"
-                  value={form.apellidos || ""}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  placeholder="Ej: Pérez García"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Input
-                label="Dirección"
-                name="direccion"
-                value={form.direccion || ""}
-                onChange={handleChange}
-                disabled={!editMode}
-                placeholder="Ej: Av. Principal #123"
-              />
-            </div>
-
-            <div>
-              <Input
-                label="Teléfono"
-                name="telefono"
-                value={form.telefono || ""}
-                onChange={handleChange}
-                disabled={!editMode}
-                required
-                error={errors.telefono}
-                placeholder="Ej: 987654321"
-                maxLength={9}
-              />
-              {editMode && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Formato: 9 dígitos sin espacios
+                <h2 className="text-2xl font-bold text-white">
+                  {profile.nombreCompleto} {profile.apellidos}
+                </h2>
+                <p className="text-gray-400 flex items-center gap-1 mt-2">
+                  <EnvelopeIcon className="w-4 h-4" />
+                  {profile.email}
                 </p>
-              )}
+              </div>
+              <div className="bg-indigo-900/30 px-3 py-1 rounded-full flex items-center">
+                <ShieldCheckIcon className="w-5 h-5 text-indigo-400 mr-2" />
+                <span className="text-indigo-300 text-sm">Verificado</span>
+              </div>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
-              {editMode ? (
-                <>
+            <form onSubmit={handleSave}>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Columna 1: Información Personal */}
+                <div className="bg-gray-900/50 p-6 rounded-xl border border-gray-700">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-700">
+                    <UserIcon className="w-6 h-6 text-indigo-500" />
+                    <h3 className="text-xl font-semibold text-gray-200">Información Personal</h3>
+                  </div>
+
+                  <div className="space-y-6">
+                    <Input
+                      label="Nombre Completo"
+                      name="nombreCompleto"
+                      value={form.nombreCompleto || ""}
+                      onChange={handleChange}
+                      disabled={!editMode}
+                      required
+                      error={errors.nombreCompleto}
+                      icon={<UserIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-white"
+                    />
+                    
+                    <Input
+                      label="Apellidos"
+                      name="apellidos"
+                      value={form.apellidos || ""}
+                      onChange={handleChange}
+                      disabled={!editMode}
+                      icon={<UserIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-white"
+                    />
+                    
+                    <Input
+                      label="DNI"
+                      value={profile.dni}
+                      disabled
+                      icon={<IdentificationIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-gray-400"
+                    />
+                    
+                    <Input
+                      label="Fecha de Registro"
+                      value={new Date(profile.createdAt).toLocaleDateString()}
+                      disabled
+                      icon={<CalendarIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-gray-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Columna 2: Información de Contacto */}
+                <div className="bg-gray-900/50 p-6 rounded-xl border border-gray-700">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-700">
+                    <GlobeAltIcon className="w-6 h-6 text-indigo-500" />
+                    <h3 className="text-xl font-semibold text-gray-200">Información de Contacto</h3>
+                  </div>
+
+                  <div className="space-y-6">
+                    <Input
+                      label="Correo Electrónico"
+                      value={profile.email}
+                      disabled
+                      icon={<EnvelopeIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-gray-400"
+                    />
+                    
+                    <Input
+                      label="Teléfono"
+                      name="telefono"
+                      value={form.telefono || ""}
+                      onChange={handleChange}
+                      disabled={!editMode}
+                      required
+                      error={errors.telefono}
+                      icon={<PhoneIcon className="w-5 h-5 text-gray-500" />}
+                      maxLength={9}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-white"
+                    />
+                    
+                    <Input
+                      label="Dirección"
+                      name="direccion"
+                      value={form.direccion || ""}
+                      onChange={handleChange}
+                      disabled={!editMode}
+                      icon={<HomeIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-white"
+                    />
+                    
+                    <Input
+                      label="Nombre de Usuario"
+                      value={profile.username}
+                      disabled
+                      icon={<CogIcon className="w-5 h-5 text-gray-500" />}
+                      className="bg-gray-800 border-gray-700"
+                      labelClassName="text-gray-400"
+                      inputClassName="text-gray-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
+                {editMode ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                      className="min-w-[160px] py-3 bg-transparent border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                      icon={<XMarkIcon className="w-5 h-5" />}
+                    >
+                      Cancelar Cambios
+                    </Button>
+                    <Button
+                      type="submit"
+                      color="primary"
+                      disabled={saving}
+                      className="min-w-[160px] py-3 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-purple-600"
+                      icon={saving ? <Spinner size="sm" /> : <CheckCircleIcon className="w-5 h-5" />}
+                    >
+                      {saving ? "Guardando..." : "Guardar Cambios"}
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     type="button"
-                    color="secondary"
-                    onClick={handleCancelEdit}
-                    disabled={saving}
-                    icon={<XMarkIcon className="w-5 h-5" />}
+                    onClick={() => setEditMode(true)}
+                    className="min-w-[180px] py-3 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                    icon={<PencilIcon className="w-5 h-5" />}
                   >
-                    Cancelar
+                    Editar Perfil
                   </Button>
-                  <Button
-                    type="submit"
-                    color="primary"
-                    disabled={saving || Object.values(errors).some(e => e)}
-                    icon={saving ? <Spinner size="sm" /> : <CheckCircleIcon className="w-5 h-5" />}
-                  >
-                    {saving ? "Guardando..." : "Guardar Cambios"}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  color="primary"
-                  onClick={() => setEditMode(true)}
-                  icon={<PencilIcon className="w-5 h-5" />}
-                >
-                  Editar Perfil
-                </Button>
-              )}
-            </div>
-          </form>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* Notificación de éxito */}
+        {/* Mensaje de última actualización */}
         {!editMode && profile.updatedAt && (
-          <div className="bg-green-50 border-t border-green-200 p-4 text-center text-sm text-green-700">
-            <div className="flex items-center justify-center">
-              <CheckCircleIcon className="w-5 h-5 mr-2" />
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p className="inline-flex items-center gap-1">
+              <CalendarIcon className="w-4 h-4" />
               Última actualización: {new Date(profile.updatedAt).toLocaleString()}
-            </div>
+            </p>
           </div>
         )}
       </div>
