@@ -12,7 +12,7 @@ import GestionarClientes from './pages/SeccionDashboard/GestionarClientes';
 import ReportesAdmin from './pages/Reportes/ReportesAdmin';
 import ReportesVigilante from './pages/Reportes/ReportesVigilante';
 import ReportesCliente from './pages/Reportes/ReportesCliente';
-
+import EstacionamientoTiempoReal from "./pages/SeccionDashboard/EstacionamientoTiempoReal";
 
 
 function App() {
@@ -68,6 +68,11 @@ function App() {
         <Route path="/dashboard/reportes-cliente" element={
           <PrivateRoute>
             <ReportesCliente />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/espacios" element={
+          <PrivateRoute>
+            <EstacionamientoTiempoReal />
           </PrivateRoute>
         } />
         

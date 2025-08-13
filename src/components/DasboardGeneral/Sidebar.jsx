@@ -6,13 +6,19 @@ import {
   UsersIcon,
   ShieldCheckIcon,
   ArrowLeftOnRectangleIcon,
-  DocumentChartBarIcon // Heroicons para reportes
+  DocumentChartBarIcon,
+  Squares2X2Icon // <-- nuevo icono para Estacionamiento
 } from '@heroicons/react/24/outline';
 
 // Ítems base para todos
 const navItemsBase = [
   { label: 'Inicio', path: '/dashboard/home', icon: HomeIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE','ROLE_CLIENTE'] },
   { label: 'Perfil', path: '/dashboard/profile', icon: UserCircleIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE','ROLE_CLIENTE'] },
+];
+
+// Ítem de Estacionamiento (Admin/Vigilante)
+const estacionamientoItems = [
+  { label: 'Estacionamiento', path: '/dashboard/espacios', icon: Squares2X2Icon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE'] },
 ];
 
 // Ítems extra para admin y vigilante
@@ -30,9 +36,10 @@ const reportesItems = [
 
 const Sidebar = ({ role, onNavigate, open, onClose, onLogout }) => {
   const location = useLocation();
-  // Unifica todos los ítems según el rol
+  // Unifica ítems (inserta Estacionamiento después de Inicio/Perfil)
   const items = [
     ...navItemsBase,
+    ...estacionamientoItems.filter(it => it.roles.includes(role)), // <-- agregado
     ...adminExtra.filter(it => it.roles.includes(role)),
     ...reportesItems.filter(it => it.roles.includes(role)),
   ];
