@@ -28,7 +28,7 @@ export default function EstacionamientoTiempoReal() {
   const [vehiculos, setVehiculos] = useState([]);
   const [showCrear, setShowCrear] = useState(false);
 
-  // Buscar clientes (igual que en GestionarClientes)
+  // Buscar clientes
   const buscarClientes = async (texto) => {
     setBusca(texto);
     if (!texto?.trim()) {
@@ -36,7 +36,7 @@ export default function EstacionamientoTiempoReal() {
       return;
     }
     try {
-      const res = await authFetch(`/api/persona/buscar-clientes?nombre=${encodeURIComponent(texto)}`);
+      const res = await authFetch(`/api/admin-cliente/buscar-clientes?nombre=${encodeURIComponent(texto)}`); // ← CAMBIO
       const data = await res.json();
       setClientes(Array.isArray(data) ? data : []);
     } catch {

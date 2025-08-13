@@ -33,7 +33,7 @@ export default function GestionarVigilantes() {
 
   const fetchVigilantes = async () => {
     try {
-      const res = await authFetch("/api/persona/listar-vigilantes");
+      const res = await authFetch("/api/admin-vigilante/listar-vigilantes"); // ← CAMBIO
       if (!res.ok) throw new Error("Error al obtener vigilantes");
       const data = await res.json();
       setVigilantes(data);
@@ -49,7 +49,7 @@ export default function GestionarVigilantes() {
 
   const buscarVigilantes = async (nombre) => {
     try {
-      const res = await authFetch(`/api/persona/buscar-vigilantes?nombre=${encodeURIComponent(nombre)}`);
+      const res = await authFetch(`/api/admin-vigilante/buscar-vigilantes?nombre=${encodeURIComponent(nombre)}`); // ← CAMBIO
       if (!res.ok) throw new Error("No se pudo buscar vigilantes");
       const data = await res.json();
       setVigilantes(data);
@@ -72,7 +72,8 @@ export default function GestionarVigilantes() {
 
   const handleSave = async (nuevoVigilante) => {
     try {
-      const resDatos = await authFetch(`/api/persona/vigilante/${nuevoVigilante.id}`, {
+      // Actualizar datos del vigilante
+      const resDatos = await authFetch(`/api/admin-vigilante/vigilante/${nuevoVigilante.id}`, { // ← CAMBIO
         method: "PUT",
         body: JSON.stringify({
           email: nuevoVigilante.email,
@@ -81,20 +82,13 @@ export default function GestionarVigilantes() {
           dni: nuevoVigilante.dni,
           direccion: nuevoVigilante.direccion,
           telefono: nuevoVigilante.telefono,
+          estado: nuevoVigilante.estado, // ← AGREGAR ESTO
         }),
       });
       if (!resDatos.ok) {
         const error = await resDatos.json();
         throw new Error(error.message || "Error al actualizar datos del vigilante");
       }
-
-      const resEstado = await authFetch(`/api/persona/vigilante/estado/${nuevoVigilante.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          estado: nuevoVigilante.estado,
-        }),
-      });
-      if (!resEstado.ok) throw new Error("Error al actualizar el estado del vigilante");
 
       toast.success("Vigilante actualizado");
       setVigilantes((prev) =>

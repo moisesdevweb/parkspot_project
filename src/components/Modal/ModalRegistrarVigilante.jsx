@@ -29,7 +29,7 @@ export default function ModalRegistrarVigilante({ open, onClose, onRegistrado })
     }
     setLoading(true);
     try {
-      const res = await authFetch("/api/auth/registrar-usuario", {
+      const res = await authFetch("/api/admin-vigilante/registrar-vigilante", {
         method: "POST",
         body: JSON.stringify({
           ...form,

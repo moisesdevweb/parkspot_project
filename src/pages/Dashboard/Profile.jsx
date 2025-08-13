@@ -18,7 +18,7 @@ function Profile() {
     if (!user?.username) return;
 
     const cargarPerfil = () => {
-      authFetch(`/api/persona/perfil/${user.username}`)
+      authFetch(`/api/persona/perfil/${user.username}`) // ← MANTENER (está correcto)
         .then((res) => res.json())
         .then((data) => {
           setPerfil(data);
@@ -48,7 +48,7 @@ function Profile() {
       return;
     }
     try {
-      const res = await authFetch(`/api/persona/perfil/${user.username}`, {
+      const res = await authFetch(`/api/persona/perfil/${user.username}`, { // ← MANTENER (está correcto)
         method: "PUT",
         body: JSON.stringify({
           nombreCompleto: form.nombreCompleto,

@@ -70,7 +70,7 @@ export default function ModalRegistrarCliente({ open, onClose, onRegistrado }) {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8080/api/persona/registrar-cliente-completo", {
+      const res = await fetch("http://localhost:8080/api/admin-cliente/registrar-cliente-completo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,8 +99,8 @@ export default function ModalRegistrarCliente({ open, onClose, onRegistrado }) {
       });
       onRegistrado();
       onClose();
-    } catch (err) {
-      toast.error(err.message);
+    } catch {
+      toast.error("Error de conexión");
     }
     setLoading(false);
   };

@@ -19,6 +19,7 @@ const camposCliente = [
   { name: "direccion", label: "Dirección", editable: true },
   { name: "telefono", label: "Teléfono", editable: true },
   { name: "email", label: "Email", editable: true },
+  { name: "estado", label: "Estado", editable: true }, 
 ];
 
 export default function GestionarClientes() {
@@ -33,7 +34,7 @@ export default function GestionarClientes() {
 
   const fetchClientes = async () => {
     try {
-      const res = await authFetch("/api/persona/listar-clientes");
+      const res = await authFetch("/api/admin-cliente/listar-clientes"); // ← CAMBIO
       const data = await res.json();
       setClientes(data);
     } catch {
@@ -60,7 +61,7 @@ export default function GestionarClientes() {
 
   const handleSave = async (nuevoCliente) => {
     try {
-      const res = await authFetch(`/api/persona/cliente-completo/${nuevoCliente.id}`, {
+      const res = await authFetch(`/api/admin-cliente/cliente-completo/${nuevoCliente.id}`, { // ← CAMBIO
         method: "PUT",
         body: JSON.stringify({
           email: nuevoCliente.email,
@@ -90,7 +91,7 @@ export default function GestionarClientes() {
 
   const buscarClientes = async (nombre) => {
     try {
-      const res = await authFetch(`/api/persona/buscar-clientes?nombre=${encodeURIComponent(nombre)}`);
+      const res = await authFetch(`/api/admin-cliente/buscar-clientes?nombre=${encodeURIComponent(nombre)}`); // ← CAMBIO
       const data = await res.json();
       setClientes(data);
     } catch {

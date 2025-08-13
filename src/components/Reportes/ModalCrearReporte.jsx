@@ -14,7 +14,7 @@ export default function ModalCrearReporte({ open, onClose, onCreado }) {
   // Cargar clientes al abrir
   useEffect(() => {
     if (open) {
-      authFetch("/api/persona/listar-clientes")
+      authFetch("/api/admin-cliente/listar-clientes") // ← CAMBIO
         .then(res => res.json())
         .then(data => setClientes(data))
         .catch(() => setClientes([]));
@@ -28,10 +28,10 @@ export default function ModalCrearReporte({ open, onClose, onCreado }) {
   // Cargar vehículos del cliente seleccionado
   useEffect(() => {
     if (clienteId) {
-      authFetch(`/api/reportes/vehiculos-cliente/${clienteId}`)
+      authFetch(`/api/admin-cliente/cliente/${clienteId}/vehiculos`) // ← CAMBIO
         .then(res => res.json())
         .then(data => {
-          console.log("Vehículos recibidos:", data); // <-- Verifica aquí
+          console.log("Vehículos recibidos:", data);
           setVehiculos(Array.isArray(data) ? data : []);
         })
         .catch(() => setVehiculos([]));
