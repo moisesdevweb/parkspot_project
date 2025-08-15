@@ -29,7 +29,7 @@ export default function useEstacionamientoData() {
   }, [isAdmin]);
 
   const fetchRegActivos = useCallback(async () => {
-    if (!getToken() || !isVigilante) return; // Solo vigilantes ven registros activos
+    if (!getToken() || (!isVigilante && !isAdmin)) return; // ✅ Ahora admin y vigilante
     try {
       const res = await authFetch("/api/estacionamiento/registros-activos");
       const data = await res.json();
@@ -38,7 +38,7 @@ export default function useEstacionamientoData() {
       console.error("Error fetching registros activos:", error);
       setRegActivos([]);
     }
-  }, [isVigilante]);
+  }, [isVigilante, isAdmin]);
 
   useEffect(() => {
     fetchEspacios();
@@ -80,5 +80,27 @@ export default function useEstacionamientoData() {
     [fetchEspacios, fetchRegActivos]
   );
 
-  return { espacios, regActivos, fetchEspacios, fetchRegActivos, registrarEntrada, registrarSalida };
+  const moverCliente = useCallback(
+    async ({ registroId, nuevoEspacioId, motivo }) => {
+      const res = await authFetch("/api/estacionamiento/mover-cliente", {
+        method: "PUT",
+        body: JSON.stringify({ registroId, nuevoEspacioId, motivo }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "No se pudo mover el cliente");
+      await Promise.all([fetchEspacios(), fetchRegActivos()]);
+      return data;
+    },
+    [fetchEspacios, fetchRegActivos]
+  );
+
+  return {
+    espacios,
+    regActivos,
+    fetchEspacios,
+    fetchRegActivos,
+    registrarEntrada,
+    registrarSalida,
+    moverCliente,
+  };
 }

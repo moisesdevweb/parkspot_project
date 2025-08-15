@@ -7,7 +7,9 @@ import {
   ShieldCheckIcon,
   ArrowLeftOnRectangleIcon,
   DocumentChartBarIcon,
-  Squares2X2Icon // <-- nuevo icono para Estacionamiento
+  Squares2X2Icon, // <-- Estacionamiento en tiempo real
+  CogIcon, // <-- nuevo icono para Gestionar Espacios
+  CalendarIcon // <-- NUEVO: ícono para Reservas
 } from '@heroicons/react/24/outline';
 
 // Ítems base para todos
@@ -16,9 +18,15 @@ const navItemsBase = [
   { label: 'Perfil', path: '/dashboard/profile', icon: UserCircleIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE','ROLE_CLIENTE'] },
 ];
 
-// Ítem de Estacionamiento (Admin/Vigilante)
+// Ítem de Estacionamiento (Admin/Vigilante/Cliente)
 const estacionamientoItems = [
-  { label: 'Estacionamiento', path: '/dashboard/espacios', icon: Squares2X2Icon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE'] },
+  { label: 'Estacionamiento', path: '/dashboard/espacios', icon: Squares2X2Icon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE', 'ROLE_CLIENTE'] },
+  { label: 'Gestionar Espacios', path: '/dashboard/gestionar-espacios', icon: CogIcon, roles: ['ROLE_ADMIN'] }, // Solo admin
+];
+
+// NUEVO: Ítems específicos para cliente
+const clienteItems = [
+  { label: 'Mis Reservas', path: '/dashboard/reservas', icon: CalendarIcon, roles: ['ROLE_CLIENTE'] },
 ];
 
 // Ítems extra para admin y vigilante
@@ -39,7 +47,8 @@ const Sidebar = ({ role, onNavigate, open, onClose, onLogout }) => {
   // Unifica ítems (inserta Estacionamiento después de Inicio/Perfil)
   const items = [
     ...navItemsBase,
-    ...estacionamientoItems.filter(it => it.roles.includes(role)), // <-- agregado
+    ...estacionamientoItems.filter(it => it.roles.includes(role)),
+    ...clienteItems.filter(it => it.roles.includes(role)), // <-- AGREGADO: ítems de cliente
     ...adminExtra.filter(it => it.roles.includes(role)),
     ...reportesItems.filter(it => it.roles.includes(role)),
   ];

@@ -1,24 +1,33 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, PencilIcon } from "@heroicons/react/24/outline";
-import toast from "react-hot-toast"; // Asegúrate de tener esto importado
+import toast from "react-hot-toast";
 
 const estadoOptions = [
   { value: 1, label: "Activo" },
   { value: 0, label: "Inactivo" },
 ];
 
+// ✅ SOLO 4 TIPOS DE VEHÍCULO
+const tipoVehiculoOptions = [
+  { value: "AUTO", label: "Auto" },
+  { value: "MOTO", label: "Moto" },
+  { value: "CAMIONETA", label: "Camioneta" },
+  { value: "SUV", label: "SUV" },
+];
+
 // campos: array de objetos { name, label, type, editable }
+// 🎭 MODAL REUTILIZABLE - Se usa para clientes Y vigilantes
 export default function ModalPersona({
-  open,
-  onClose,
-  persona,
-  onSave,
-  mode = "view",
-  campos = [],
-  titulo = "Detalle",
-  mostrarEstado = true,
-  mostrarVehiculos = false, // <--- NUEVA PROP
+  open,           // ✅ Controla si el modal está abierto
+  onClose,        // ✅ Función para cerrar el modal
+  persona,        // ✅ Datos de la persona a mostrar/editar
+  onSave,         // ✅ Función que se ejecuta al guardar cambios
+  mode = "view",  // 🔄 "view" = solo ver | "edit" = editar
+  campos = [],    // 📝 Array que define qué campos mostrar y cuáles son editables
+  titulo = "Detalle",        // 📌 Título del modal
+  mostrarEstado = true,      // 🚦 Mostrar/ocultar selector de estado
+  mostrarVehiculos = false,  // 🚗 Mostrar/ocultar sección de vehículos
 }) {
   const [form, setForm] = useState({});
   const [vehiculos, setVehiculos] = useState([]);
@@ -52,7 +61,14 @@ export default function ModalPersona({
   const handleAddVehiculo = () => {
     setVehiculos([
       ...vehiculos,
-      { placa: "", marca: "", modelo: "", color: "", año: "", tipo: "" },
+      { 
+        placa: "", 
+        marca: "", 
+        modelo: "", 
+        color: "", 
+        año: "", 
+        tipo: "AUTO" // ✅ VALOR POR DEFECTO
+      },
     ]);
   };
 
@@ -152,15 +168,17 @@ export default function ModalPersona({
                   </div>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* 📝 Los campos se definen desde el componente padre
+                  Ejemplo: [{ name: "dni", label: "DNI", editable: true }] */}
                   {campos.map(campo => (
                     <div key={campo.name}>
                       <label className="block text-gray-300 text-sm mb-1">{campo.label}</label>
                       <input
-                        className={inputClass(mode === "edit" && campo.editable)}
+                        className={inputClass(mode === "edit" && campo.editable)} // ✅ Solo editable si mode="edit" Y campo.editable=true
                         name={campo.name}
                         value={form[campo.name]}
                         onChange={handleChange}
-                        disabled={mode === "view" || !campo.editable}
+                        disabled={mode === "view" || !campo.editable}            // 🔒 Deshabilitado en modo vista o si no es editable
                         type={campo.type || "text"}
                       />
                     </div>
@@ -229,12 +247,19 @@ export default function ModalPersona({
                                     value={v.año}
                                     onChange={e => handleVehiculoChange(idx, "año", e.target.value)}
                                   />
-                                  <input
+                                  {/* ✅ CAMBIAR ESTE INPUT POR SELECT */}
+                                  <select
                                     className="bg-gray-900 text-white rounded px-2 py-1 mb-1"
-                                    placeholder="Tipo"
-                                    value={v.tipo}
+                                    value={v.tipo || ""}
                                     onChange={e => handleVehiculoChange(idx, "tipo", e.target.value)}
-                                  />
+                                  >
+                                    <option value="">Seleccionar tipo</option>
+                                    {tipoVehiculoOptions.map(opt => (
+                                      <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                      </option>
+                                    ))}
+                                  </select>
                                   <button
                                     type="button"
                                     className="mt-1 px-2 py-1 bg-red-700 rounded text-white hover:bg-red-800 w-fit"

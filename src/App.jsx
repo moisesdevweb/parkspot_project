@@ -13,12 +13,12 @@ import ReportesAdmin from './pages/Reportes/ReportesAdmin';
 import ReportesVigilante from './pages/Reportes/ReportesVigilante';
 import ReportesCliente from './pages/Reportes/ReportesCliente';
 import EstacionamientoTiempoReal from "./pages/SeccionDashboard/EstacionamientoTiempoReal";
-
+import GestionEspacios from "./pages/SeccionDashboard/GestionEspacios"; // ✅ NUEVO
 
 function App() {
   return (
     <Router>
-      <Toaster position="top-right" /> {/* <-- Agrega esto una sola vez */}
+      <Toaster position="top-right" />
       <Routes>
         {/* Redirige a /login cuando accedas a la ruta raíz */}
         <Route path="/" element={<Navigate to="/login" />} />
@@ -37,14 +37,13 @@ function App() {
             <ClientDashboard />
           </PrivateRoute>
         } />
-        {/* Cambia esta ruta para usar ProfilePage */}
         <Route path="/dashboard/profile" element={
           <PrivateRoute>
             <ProfilePage />
           </PrivateRoute>
         } />
         
-        {/* Nueva ruta para listar vigilantes */}
+        {/* Gestión de usuarios */}
         <Route path="/dashboard/GestionarVigilantes" element={
           <PrivateRoute>
             <GestionarVigilantes />
@@ -55,6 +54,27 @@ function App() {
             <GestionarClientes />
           </PrivateRoute>
         } />
+
+        {/* Estacionamiento */}
+        <Route path="/dashboard/espacios" element={
+          <PrivateRoute>
+            <EstacionamientoTiempoReal />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/gestionar-espacios" element={
+          <PrivateRoute>
+            <GestionEspacios />
+          </PrivateRoute>
+        } />
+
+        {/* NUEVO: Reservas del cliente */}
+        <Route path="/dashboard/reservas" element={
+          <PrivateRoute>
+            <Reservas />
+          </PrivateRoute>
+        } />
+
+        {/* Reportes */}
         <Route path="/dashboard/reportes" element={
           <PrivateRoute>
             <ReportesAdmin />
@@ -70,13 +90,8 @@ function App() {
             <ReportesCliente />
           </PrivateRoute>
         } />
-        <Route path="/dashboard/espacios" element={
-          <PrivateRoute>
-            <EstacionamientoTiempoReal />
-          </PrivateRoute>
-        } />
         
-        {/* Página de reservas */}
+        {/* Página de reservas (fuera del dashboard) */}
         <Route path="/reservas" element={<Reservas />} />
       </Routes>
     </Router>

@@ -35,7 +35,8 @@ const DashboardAppBar = ({ user, onProfile, onLogout, onMenuToggle, onNavigate }
         ...base,
         { label: 'Gestionar Clientes', path: '/dashboard/gestionar-clientes', keywords: ['gestionar', 'clientes'] },
         { label: 'Gestionar Vigilantes', path: '/dashboard/GestionarVigilantes', keywords: ['gestionar', 'vigilantes'] },
-        { label: 'Espacios', path: '/dashboard/espacios', keywords: ['cocheras', 'slots'] },
+        { label: 'Estacionamiento', path: '/dashboard/espacios', keywords: ['estacionamiento', 'espacios', 'tiempo', 'real'] },
+        { label: 'Gestionar Espacios', path: '/dashboard/gestionar-espacios', keywords: ['gestionar', 'espacios', 'cocheras', 'crear', 'editar'] },
         { label: 'Reportes', path: '/dashboard/reportes', keywords: ['estadísticas', 'incidencias', 'reportes'] },
         { label: 'Configuración', path: '/dashboard/configuracion', keywords: ['ajustes', 'settings'] },
       ];
@@ -45,7 +46,7 @@ const DashboardAppBar = ({ user, onProfile, onLogout, onMenuToggle, onNavigate }
         { label: 'Inicio', path: '/dashboard', keywords: ['home', 'principal'] },
         ...base,
         { label: 'Gestionar Clientes', path: '/dashboard/gestionar-clientes', keywords: ['gestionar', 'clientes'] },
-        { label: 'Espacios', path: '/dashboard/espacios', keywords: ['cocheras', 'slots'] },
+        { label: 'Estacionamiento', path: '/dashboard/espacios', keywords: ['estacionamiento', 'espacios', 'tiempo', 'real'] },
         { label: 'Reportes', path: '/dashboard/reportes-vigilante', keywords: ['estadísticas', 'incidencias', 'reportes'] },
       ];
     }
