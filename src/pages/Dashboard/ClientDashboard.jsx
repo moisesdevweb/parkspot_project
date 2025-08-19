@@ -15,6 +15,9 @@ function ClientDashboard() {
       const roles = userObj.roles || [];
       if (!roles.includes('ROLE_CLIENTE')) {
         navigate('/dashboard/admin');
+      } else {
+        // Redirigir automáticamente al dashboard de estadísticas del cliente
+        navigate('/dashboard/cliente-estadisticas');
       }
     } else {
       navigate('/login');

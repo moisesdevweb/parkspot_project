@@ -15,6 +15,9 @@ function AdminVigilanteDashboard() {
       const roles = userObj.roles || [];
       if (!roles.includes('ROLE_ADMIN') && !roles.includes('ROLE_VIGILANTE')) {
         navigate('/dashboard/cliente');
+      } else {
+        // Redirigir automáticamente al dashboard de estadísticas
+        navigate('/dashboard/estadisticas');
       }
     } else {
       navigate('/login');

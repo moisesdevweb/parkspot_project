@@ -14,6 +14,10 @@ import ReportesVigilante from './pages/Reportes/ReportesVigilante';
 import ReportesCliente from './pages/Reportes/ReportesCliente';
 import EstacionamientoTiempoReal from "./pages/SeccionDashboard/EstacionamientoTiempoReal";
 import GestionEspacios from "./pages/SeccionDashboard/GestionEspacios"; // ✅ NUEVO
+import GestionarReservas from './pages/SeccionDashboard/GestionarReservas';
+import DashboardEstadisticas from './pages/SeccionDashboard/DashboardEstadisticas';
+import DashboardCliente from './pages/SeccionDashboard/DashboardCliente';
+import DashboardRedirect from './components/DashboardRedirect';
 
 function App() {
   return (
@@ -27,6 +31,21 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Dashboard */}
+        <Route path="/dashboard/home" element={
+          <PrivateRoute>
+            <DashboardRedirect />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/estadisticas" element={
+          <PrivateRoute roles={["ROLE_ADMIN", "ROLE_VIGILANTE"]}>
+            <DashboardEstadisticas />
+          </PrivateRoute>
+        } />
+        <Route path="/dashboard/cliente-estadisticas" element={
+          <PrivateRoute roles={["ROLE_CLIENTE"]}>
+            <DashboardCliente />
+          </PrivateRoute>
+        } />
         <Route path="/dashboard/admin" element={
           <PrivateRoute>
             <AdminVigilanteDashboard />
@@ -56,12 +75,12 @@ function App() {
         } />
 
         {/* Estacionamiento */}
-        <Route path="/dashboard/espacios" element={
+        <Route path="/dashboard/estacionamiento" element={
           <PrivateRoute>
             <EstacionamientoTiempoReal />
           </PrivateRoute>
         } />
-        <Route path="/dashboard/gestionar-espacios" element={
+        <Route path="/dashboard/gestion-espacios" element={
           <PrivateRoute>
             <GestionEspacios />
           </PrivateRoute>
@@ -71,6 +90,12 @@ function App() {
         <Route path="/dashboard/reservas" element={
           <PrivateRoute>
             <Reservas />
+          </PrivateRoute>
+        } />
+        {/* NUEVO: Gestión de reservas */}
+        <Route path="/dashboard/gestionar-reservas" element={
+          <PrivateRoute roles={["ROLE_ADMIN", "ROLE_VIGILANTE"]}>
+            <GestionarReservas />
           </PrivateRoute>
         } />
 

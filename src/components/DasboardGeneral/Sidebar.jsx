@@ -9,19 +9,24 @@ import {
   DocumentChartBarIcon,
   Squares2X2Icon, // <-- Estacionamiento en tiempo real
   CogIcon, // <-- nuevo icono para Gestionar Espacios
-  CalendarIcon // <-- NUEVO: ícono para Reservas
+  CalendarIcon, // <-- NUEVO: ícono para Reservas
+  ClipboardDocumentListIcon, // <-- NUEVO: ícono para gestionar reservas
+  ChartBarIcon // <-- NUEVO: ícono para Dashboard
 } from '@heroicons/react/24/outline';
 
 // Ítems base para todos
 const navItemsBase = [
+  { label: 'Dashboard', path: '/dashboard/estadisticas', icon: ChartBarIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE'] },
+  { label: 'Mi Dashboard', path: '/dashboard/cliente-estadisticas', icon: ChartBarIcon, roles: ['ROLE_CLIENTE'] },
   { label: 'Inicio', path: '/dashboard/home', icon: HomeIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE','ROLE_CLIENTE'] },
   { label: 'Perfil', path: '/dashboard/profile', icon: UserCircleIcon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE','ROLE_CLIENTE'] },
 ];
 
 // Ítem de Estacionamiento (Admin/Vigilante/Cliente)
 const estacionamientoItems = [
-  { label: 'Estacionamiento', path: '/dashboard/espacios', icon: Squares2X2Icon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE', 'ROLE_CLIENTE'] },
-  { label: 'Gestionar Espacios', path: '/dashboard/gestionar-espacios', icon: CogIcon, roles: ['ROLE_ADMIN'] }, // Solo admin
+  { label: 'Estacionamiento', path: '/dashboard/estacionamiento', icon: Squares2X2Icon, roles: ['ROLE_ADMIN','ROLE_VIGILANTE', 'ROLE_CLIENTE'] },
+  { label: 'Gestionar Espacios', path: '/dashboard/gestion-espacios', icon: CogIcon, roles: ['ROLE_ADMIN'] },
+  { label: 'Gestionar Reservas', path: '/dashboard/gestionar-reservas', icon: ClipboardDocumentListIcon, roles: ['ROLE_ADMIN', 'ROLE_VIGILANTE'] }, // <-- NUEVO
 ];
 
 // NUEVO: Ítems específicos para cliente

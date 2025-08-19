@@ -8,6 +8,7 @@ import useEstacionamientoData from "../../hooks/useEstacionamientoData";
 import EspacioCard from "../../components/Estacionamiento/EspacioCard";
 import PanelClientesVehiculos from "../../components/Estacionamiento/PanelClientesVehiculos";
 import ModalCrearReserva from "../../components/Estacionamiento/ModalCrearReserva";
+import CroquisEstacionamiento from "../../components/Estacionamiento/CroquisEstacionamiento"; // <-- ✅ ESTE IMPORT
 
 export default function EstacionamientoTiempoReal() {
   const navigate = useNavigate();
@@ -36,11 +37,16 @@ export default function EstacionamientoTiempoReal() {
   const abrirModalReserva = (espacio) => setModalReserva({ open: true, espacio });
   const cerrarModalReserva = () => setModalReserva({ open: false, espacio: null });
 
+  // Agregar toggle para cambiar vista
+  const [vistaActual, setVistaActual] = useState('grid'); // 'grid' o 'croquis'
+
   // Buscar clientes
   const buscarClientes = async (texto) => {
     setBusca(texto);
     if (!texto?.trim()) {
       setClientes([]);
+      setClienteSel(null); // Limpiar cliente seleccionado
+      setVehiculos([]); // Limpiar vehículos
       return;
     }
     try {
@@ -189,20 +195,47 @@ export default function EstacionamientoTiempoReal() {
       onProfile={() => navigate("/dashboard/profile")}
       onNavigate={navigate}
     >
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-white">Gestión de Estacionamiento</h1>
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-gray-300">
-            {isVigilante ? (
-              "Arrastra un vehículo a un espacio DISPONIBLE/RESERVADO. Clic en un espacio OCUPADO para registrar salida."
-            ) : isAdmin ? (
-              "Arrastra espacios OCUPADOS hacia espacios DISPONIBLES para reasignar vehículos. Vista de espacios de estacionamiento."
-            ) : isCliente ? (
-              "Haz clic en 'Reservar' para solicitar un espacio disponible. Solo puedes visualizar el estado de los espacios."
-            ) : (
-              "Vista de espacios de estacionamiento. Acceso de solo lectura."
-            )}
-          </p>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Gestión de Estacionamiento</h1>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-gray-300">
+              {isVigilante ? (
+                "Arrastra un vehículo a un espacio DISPONIBLE/RESERVADO. Clic en un espacio OCUPADO para registrar salida."
+              ) : isAdmin ? (
+                "Arrastra espacios OCUPADOS hacia espacios DISPONIBLES para reasignar vehículos. Vista de espacios de estacionamiento."
+              ) : isCliente ? (
+                "Haz clic en 'Reservar' para solicitar un espacio disponible. Solo puedes visualizar el estado de los espacios."
+              ) : (
+                "Vista de espacios de estacionamiento. Acceso de solo lectura."
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Toggle de vista */}
+        <div className="flex items-center gap-3">
+          <span className="text-gray-300 text-sm">Vista:</span>
+          <button
+            onClick={() => setVistaActual('grid')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              vistaActual === 'grid' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            📱 Tarjetas
+          </button>
+          <button
+            onClick={() => setVistaActual('croquis')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              vistaActual === 'croquis' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            🗺️ Croquis
+          </button>
         </div>
       </div>
 
@@ -210,37 +243,48 @@ export default function EstacionamientoTiempoReal() {
         <div className="flex gap-4">
           {/* Columna izquierda: grid */}
           <div className={isCliente ? "w-full" : "flex-1"}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3">
-              {espacios.length === 0 ? (
-                <div className="col-span-full text-gray-400 flex items-center gap-3">
-                  <span>No hay espacios para mostrar.</span>
-                  {isAdmin && (
-                    <span className="text-blue-400">
-                      Dirígete a <strong>"Gestionar Espacios"</strong> para crear tu primer espacio.
-                    </span>
-                  )}
-                </div>
-              ) : (
-                espacios.map(e => (
-                  <div key={e.id} className="relative">
-                    <EspacioCard
-                      espacio={e}
-                      ocupadoPor={ocupantesPorNumero.get(e.numero)}
-                      onClick={onClickEspacio}
-                    />
-                    {/* Botón reservar solo para cliente y espacio disponible */}
-                    {isCliente && e.estado === "DISPONIBLE" && (
-                      <button
-                        className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs shadow hover:bg-blue-700"
-                        onClick={() => abrirModalReserva(e)}
-                      >
-                        Reservar
-                      </button>
+            {vistaActual === 'grid' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3">
+                {espacios.length === 0 ? (
+                  <div className="col-span-full text-gray-400 flex items-center gap-3">
+                    <span>No hay espacios para mostrar.</span>
+                    {isAdmin && (
+                      <span className="text-blue-400">
+                        Dirígete a <strong>"Gestionar Espacios"</strong> para crear tu primer espacio.
+                      </span>
                     )}
                   </div>
-                ))
-              )}
-            </div>
+                ) : (
+                  espacios.map(e => (
+                    <div key={e.id} className="relative">
+                      <EspacioCard
+                        espacio={e}
+                        ocupadoPor={ocupantesPorNumero.get(e.numero)}
+                        onClick={onClickEspacio}
+                      />
+                      {/* Botón reservar solo para cliente y espacio disponible */}
+                      {isCliente && e.estado === "DISPONIBLE" && (
+                        <button
+                          className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs shadow hover:bg-blue-700"
+                          onClick={() => abrirModalReserva(e)}
+                        >
+                          Reservar
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              <CroquisEstacionamiento
+                espacios={espacios}
+                ocupantesPorNumero={ocupantesPorNumero}
+                onClickEspacio={onClickEspacio}
+                onDragEnd={onDragEnd}
+                isCliente={isCliente}
+                onReservar={abrirModalReserva}
+              />
+            )}
           </div>
 
           {/* Columna derecha: panel docked - Solo para vigilantes */}
